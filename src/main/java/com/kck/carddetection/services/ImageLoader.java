@@ -17,4 +17,5 @@ public class ImageLoader {
     public void saveImage(Mat imageMatrix, String targetPath) {
         imwrite(targetPath, imageMatrix);
     }
+
 }

@@ -19,17 +19,17 @@ public class ImageLoaderTest {
     ImageLoader imageLoader;
 
     @BeforeAll
-    public static void init(){
+    public static void init() {
         File file = new File("src/test/resources/newImage.jpg");
         file.delete();
     }
 
     @Test
-    public void shouldLoadAndSaveImage(){
+    public void shouldLoadAndSaveImage() {
         Mat mat = imageLoader.loadImage("src/main/resources/Spades.jpg");
         imageLoader.saveImage(mat, "src/test/resources/newImage.jpg");
         Mat mat2 = imageLoader.loadImage("src/test/resources/newImage.jpg");
         assertNotNull(mat);
-        assertEquals(mat.toString(),mat2.toString());
+        assertEquals(mat.toString(), mat2.toString());
     }
 }
