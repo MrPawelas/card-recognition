@@ -1,4 +1,4 @@
-package com.kck.carddetection.services;
+package com.kck.carddetection.service;
 
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Size;

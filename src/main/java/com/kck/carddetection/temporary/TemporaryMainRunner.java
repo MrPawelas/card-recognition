@@ -1,7 +1,7 @@
 package com.kck.carddetection.temporary;
 
-import com.kck.carddetection.services.ImageLoader;
-import com.kck.carddetection.services.MatrixProcessor;
+import com.kck.carddetection.service.ImageLoader;
+import com.kck.carddetection.service.MatrixProcessor;
 import lombok.RequiredArgsConstructor;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.stereotype.Component;

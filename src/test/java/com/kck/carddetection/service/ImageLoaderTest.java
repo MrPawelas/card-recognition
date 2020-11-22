@@ -1,6 +1,5 @@
-package com.kck.carddetection;
+package com.kck.carddetection.service;
 
-import com.kck.carddetection.services.ImageLoader;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
