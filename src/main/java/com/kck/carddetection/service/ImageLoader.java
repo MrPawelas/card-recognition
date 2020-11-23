@@ -1,4 +1,4 @@
-package com.kck.carddetection.services;
+package com.kck.carddetection.service;
 
 import lombok.RequiredArgsConstructor;
 import org.bytedeco.opencv.opencv_core.Mat;

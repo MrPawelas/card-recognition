@@ -1,6 +1,5 @@
-package com.kck.carddetection;
+package com.kck.carddetection.service;
 
-import com.kck.carddetection.services.ImageLoader;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,15 +19,15 @@ public class ImageLoaderTest {
 
     @BeforeAll
     public static void init() {
-        File file = new File("src/test/resources/newImage.jpg");
+        File file = new File("src/test/resources/tempImage.jpg");
         file.delete();
     }
 
     @Test
     public void shouldLoadAndSaveImage() {
-        Mat mat = imageLoader.loadImage("src/main/resources/Spades.jpg");
-        imageLoader.saveImage(mat, "src/test/resources/newImage.jpg");
-        Mat mat2 = imageLoader.loadImage("src/test/resources/newImage.jpg");
+        Mat mat = imageLoader.loadImage("src/main/resources/Zbiory/1.jpg");
+        imageLoader.saveImage(mat, "src/test/resources/tempImage.jpg");
+        Mat mat2 = imageLoader.loadImage("src/test/resources/tempImage.jpg");
         assertNotNull(mat);
         assertEquals(mat.toString(), mat2.toString());
     }
