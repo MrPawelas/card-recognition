@@ -10,7 +10,7 @@ public class CardDetectionApplication {
 
     public static void main(String[] args) {
         ApplicationContext applicationContext = SpringApplication.run(CardDetectionApplication.class, args);
-        applicationContext.getBean(TemporaryMainRunner.class).main();
+        applicationContext.getBean(TemporaryMainRunner.class).run();
     }
 
 }

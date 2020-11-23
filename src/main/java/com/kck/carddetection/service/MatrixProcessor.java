@@ -1,10 +1,6 @@
 package com.kck.carddetection.service;
 
-import com.sun.scenario.effect.GaussianBlur;
-import org.bytedeco.opencv.opencv_core.Mat;
-import org.bytedeco.opencv.opencv_core.MatVector;
-import org.bytedeco.opencv.opencv_core.Size;
-import org.bytedeco.opencv.opencv_imgproc.Vec2fVector;
+import org.bytedeco.opencv.opencv_core.*;
 import org.springframework.stereotype.Service;
 
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
@@ -14,7 +10,7 @@ public class MatrixProcessor {
 
     public Mat grayImage(Mat imageMatrix) {
         Mat result = new Mat();
-        cvtColor(imageMatrix, result, COLOR_BGR2GRAY); //moje oczy >.< czemu to po prostu nie zwroci result tylko miesza w argumencie. Ehhhh...
+        cvtColor(imageMatrix, result, CV_BGR2GRAY);
         return result;
     }
 
