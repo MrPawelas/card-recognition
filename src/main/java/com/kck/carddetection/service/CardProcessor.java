@@ -7,10 +7,8 @@ import org.bytedeco.opencv.opencv_core.*;
 import org.opencv.core.CvType;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Arrays;
-import java.util.List;
-import java.util.ListIterator;
 
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
@@ -101,6 +99,7 @@ public class CardProcessor {
     }
 
     private Mat extractSubImage(Mat contour, Mat image,int index){
+        findCorners(contour);
         Mat boxMat = new Mat();
         RotatedRect rotatedRect = minAreaRect(contour);
         boxPoints(rotatedRect, boxMat);
@@ -129,7 +128,22 @@ public class CardProcessor {
         return card;
     }
     private Point[] findCorners(Mat contour){
-        //toDO
-        return null;
+        IntRawIndexer intRawIndexer = contour.createIndexer();
+        ArrayList<Point> pointList = new ArrayList<>();
+        for (int i = 0; i < contour.rows(); i+=1) {
+            pointList.add(new Point(intRawIndexer.get(i,0,0),intRawIndexer.get(i,0,1)));
+        }
+       /* System.out.println(pointList.stream().max(Comparator.comparingInt(Point::x)).get().x() + " " + pointList.stream().max(Comparator.comparingInt(Point::x)).get().y());
+        System.out.println(pointList.stream().min(Comparator.comparingInt(Point::x)).get().x() + " " + pointList.stream().min(Comparator.comparingInt(Point::x)).get().y());
+        System.out.println(pointList.stream().max(Comparator.comparingInt(Point::y)).get().x() + " " + pointList.stream().max(Comparator.comparingInt(Point::y)).get().y());
+        System.out.println(pointList.stream().min(Comparator.comparingInt(Point::y)).get().x() + " " + pointList.stream().min(Comparator.comparingInt(Point::y)).get().y());*/
+
+
+        return new Point[]{
+                pointList.stream().max(Comparator.comparingInt(Point::x)).get(),
+                pointList.stream().min(Comparator.comparingInt(Point::x)).get(),
+                pointList.stream().max(Comparator.comparingInt(Point::y)).get(),
+                pointList.stream().min(Comparator.comparingInt(Point::y)).get()
+        };
     }
 }
