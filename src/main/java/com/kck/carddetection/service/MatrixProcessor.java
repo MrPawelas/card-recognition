@@ -26,7 +26,7 @@ public class MatrixProcessor {
     }
     public Mat bluredImage(Mat imageMatrix){
         Mat result = new Mat();
-        medianBlur(imageMatrix,result,11);
+        medianBlur(imageMatrix, result, 51);
         return result;
     }
 }

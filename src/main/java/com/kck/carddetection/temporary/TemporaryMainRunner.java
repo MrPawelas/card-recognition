@@ -26,11 +26,13 @@ public class TemporaryMainRunner {
 //        mat = matrixProcessor.bluredImage(mat);
 //        mat = matrixProcessor.imageThresholded(mat);
 //        imageLoader.saveImage(mat, "src/main/resources/testImage.jpg");
-        Mat mat2 = imageLoader.loadImage("src/main/resources/cardsOnFloor.jpg");
+        Mat mat2 = imageLoader.loadImage("src/main/resources/Zbiory/1.jpg");
 
-        mat2 = matrixProcessor.resizeImage(mat2, 600, 400);
+        //  mat2 = matrixProcessor.resizeImage(mat2, 600, 400);
 
         Mat mat = matrixProcessor.grayImage(mat2);
+        imageLoader.saveImage(mat, "src/main/resources/szary.jpg");
+
         mat = matrixProcessor.bluredImage(mat);
         imageLoader.saveImage(mat, "src/main/resources/rozmyty.jpg");
 

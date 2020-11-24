@@ -2,9 +2,7 @@ package com.kck.carddetection.service;
 
 import lombok.RequiredArgsConstructor;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
-import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.opencv.opencv_core.*;
-import org.opencv.core.CvType;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,8 +31,14 @@ public class CardProcessor {
         MatVector boxVector = new MatVector();
 
         for (Mat mat : contoursVec.get()) {
+            //todo ten zakomentowany kawałek może się przydać - jak kiedys zamiast prostokatow bedzie widzial niepozamykane figury to odkomentowac
+            //  double epsilon = 0.1*arcLength(mat,true);
+            //   Mat temp = new Mat();
+            //   temp=mat.clone();
+            // approxPolyDP(mat,temp,epsilon,true);
             if (contourArea(mat) > 1000 && probabilityOfRectangle(mat) > 0.9) {
                 cntfiltered.push_back(mat);
+                System.out.println("rect");
             }
         }
 
@@ -46,26 +50,26 @@ public class CardProcessor {
 
         while (it.hasNext()) {
             int index = it.nextIndex();
-            Mat mat = it.next();
-            RotatedRect rotatedRect = minAreaRect(mat);
-            Mat boxMat = new Mat();
-            boxPoints(rotatedRect, boxMat);
-            Mat boxMatIntegers = new Mat();
-
-            int rows = boxMat.rows(), cols = boxMat.cols();
-            boxMatIntegers.create(rows, cols, CvType.CV_32S);
-
-            FloatRawIndexer floatRawIndexer = boxMat.createIndexer();
-            IntRawIndexer intRawIndexer = boxMatIntegers.createIndexer();
-            for (int i = 0; i < rows; i++) {
-                for (int j = 0; j < cols; j++) {
-                    intRawIndexer.put(i, j, Math.round(floatRawIndexer.get(i, j)));
-                }
-            }
-
-            boxVector.push_back(boxMatIntegers);
-            //System.out.println(contourArea(mat) / contourArea(boxMat));
-            drawContours(result, boxVector, index, colors.get(index));
+            //todo I guess usunąc caly ten kod ? :(
+//            Mat mat = it.next();
+//            RotatedRect rotatedRect = minAreaRect(mat);
+//            Mat boxMat = new Mat();
+//            boxPoints(rotatedRect, boxMat);
+//            Mat boxMatIntegers = new Mat();
+//
+//            int rows = boxMat.rows(), cols = boxMat.cols();
+//            boxMatIntegers.create(rows, cols, CvType.CV_32S);
+//
+//            FloatRawIndexer floatRawIndexer = boxMat.createIndexer();
+//            IntRawIndexer intRawIndexer = boxMatIntegers.createIndexer();
+//            for (int i = 0; i < rows; i++) {
+//                for (int j = 0; j < cols; j++) {
+//                    intRawIndexer.put(i, j, Math.round(floatRawIndexer.get(i, j)));
+//                }
+//            }
+//
+//            boxVector.push_back(boxMatIntegers);
+            drawContours(result, cntfiltered, index, colors.get(index));
         }
         return result;
     }
@@ -85,6 +89,11 @@ public class CardProcessor {
         colors.add(Scalar.RED);
         colors.add(Scalar.BLACK);
         colors.add(Scalar.MAGENTA);
+        colors.add(Scalar.BLUE);
+        colors.add(Scalar.BLUE);
+        colors.add(Scalar.BLUE);
+        colors.add(Scalar.BLUE);
+        colors.add(Scalar.BLUE);
         colors.add(Scalar.BLUE);
 
     }
