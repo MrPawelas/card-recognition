@@ -2,7 +2,9 @@ package com.kck.carddetection.service;
 
 import lombok.RequiredArgsConstructor;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
+import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.opencv.opencv_core.*;
+import org.opencv.core.CvType;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,21 +20,20 @@ import static org.bytedeco.opencv.global.opencv_imgproc.*;
 public class CardProcessor {
 
     private final MatrixProcessor matrixProcessor;
-    Mat result;
 
     //todo rozbic na dwie metody
     public Mat extractCardsFromPicture(Mat imageMatrix, Mat originalImage) {
         Mat hierarchy = new Mat();
-        result = originalImage.clone();
+        Mat result = originalImage.clone();
 
         MatVector contoursVec = new MatVector(); //to jest vector z c++ a nie że wektor jako jeden wiersz macierzy
         findContours(imageMatrix, contoursVec, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
 
         MatVector cntfiltered = new MatVector();
+        MatVector boxVector = new MatVector();
 
         for (Mat mat : contoursVec.get()) {
             if (contourArea(mat) > 1000 && probabilityOfRectangle(mat) > 0.9) {
-                System.out.println("rectangle!");
                 cntfiltered.push_back(mat);
             }
         }
@@ -42,25 +43,29 @@ public class CardProcessor {
 
         List<Mat> mats = Arrays.asList(cntfiltered.get()); //taki tam odpowiednik enumerate w javie xd
         ListIterator<Mat> it = mats.listIterator();
+
         while (it.hasNext()) {
             int index = it.nextIndex();
             Mat mat = it.next();
             RotatedRect rotatedRect = minAreaRect(mat);
             Mat boxMat = new Mat();
             boxPoints(rotatedRect, boxMat);
+            Mat boxMatIntegers = new Mat();
 
-            FloatRawIndexer uByteIndexer = boxMat.createIndexer();
             int rows = boxMat.rows(), cols = boxMat.cols();
+            boxMatIntegers.create(rows, cols, CvType.CV_32S);
+
+            FloatRawIndexer floatRawIndexer = boxMat.createIndexer();
+            IntRawIndexer intRawIndexer = boxMatIntegers.createIndexer();
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
-
-                    uByteIndexer.put(i, j, Math.round(uByteIndexer.get(i, j)));
-                    //   System.out.println(uByteIndexer.get(i,j));
+                    intRawIndexer.put(i, j, Math.round(floatRawIndexer.get(i, j)));
                 }
             }
-            System.out.println(contourArea(mat) / contourArea(boxMat));
-            drawContours(result, cntfiltered, -1, Scalar.BLUE); //todo tu jest bug, moim zdaniem znajduje prostokąty tylko nie umie ich narysować.
-            //todo jeżeli nie uda sie go pokonac to bedzie trzeba przejsc na innego wrappera opencv gdzie nie uzywa sie MatVector tylko liste punktow
+
+            boxVector.push_back(boxMatIntegers);
+            //System.out.println(contourArea(mat) / contourArea(boxMat));
+            drawContours(result, boxVector, index, colors.get(index));
         }
         return result;
     }
@@ -76,11 +81,12 @@ public class CardProcessor {
     }
 
     private void addExampleColors(List<Scalar> colors) {
-        colors.add(new Scalar(34.0));
-        colors.add(new Scalar(124.0));
-        colors.add(new Scalar(74.0));
-        colors.add(new Scalar(94.0));
-        colors.add(new Scalar(154.0));
+        colors.add(Scalar.GREEN);
+        colors.add(Scalar.RED);
+        colors.add(Scalar.BLACK);
+        colors.add(Scalar.MAGENTA);
+        colors.add(Scalar.BLUE);
+
     }
 
     private double probabilityOfRectangle(Mat contour) {
