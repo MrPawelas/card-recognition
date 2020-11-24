@@ -2,7 +2,9 @@ package com.kck.carddetection.service;
 
 import lombok.RequiredArgsConstructor;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
+import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.opencv.opencv_core.*;
+import org.opencv.core.CvType;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -50,27 +52,11 @@ public class CardProcessor {
 
         while (it.hasNext()) {
             int index = it.nextIndex();
-            //todo I guess usunąc caly ten kod ? :(
-//            Mat mat = it.next();
-//            RotatedRect rotatedRect = minAreaRect(mat);
-//            Mat boxMat = new Mat();
-//            boxPoints(rotatedRect, boxMat);
-//            Mat boxMatIntegers = new Mat();
-//
-//            int rows = boxMat.rows(), cols = boxMat.cols();
-//            boxMatIntegers.create(rows, cols, CvType.CV_32S);
-//
-//            FloatRawIndexer floatRawIndexer = boxMat.createIndexer();
-//            IntRawIndexer intRawIndexer = boxMatIntegers.createIndexer();
-//            for (int i = 0; i < rows; i++) {
-//                for (int j = 0; j < cols; j++) {
-//                    intRawIndexer.put(i, j, Math.round(floatRawIndexer.get(i, j)));
-//                }
-//            }
-//
-//            boxVector.push_back(boxMatIntegers);
-            drawContours(result, cntfiltered, index, colors.get(index));
+            it.next();
+            drawContours(result, cntfiltered, index, colors.get(index),10,10,hierarchy,0,new Point(0,0));
+            extractSubImage(cntfiltered.get(index), originalImage,index);
         }
+
         return result;
     }
 
@@ -114,5 +100,36 @@ public class CardProcessor {
         return contourArea(contour) / contourArea(boxMat);
     }
 
+    private Mat extractSubImage(Mat contour, Mat image,int index){
+        Mat boxMat = new Mat();
+        RotatedRect rotatedRect = minAreaRect(contour);
+        boxPoints(rotatedRect, boxMat);
+        Mat pointsMat = new Mat();
+        pointsMat.create(4,2,CvType.CV_32F);
+        FloatRawIndexer intRawIndexer = pointsMat.createIndexer();
+        int width = (int) rotatedRect.size().width();
+        int height = (int) rotatedRect.size().height();
 
+        int[][] points = new int[][]   {{0, height-1},
+                {0, 0},
+                {width-1, 0},
+                {width-1, height-1}};
+
+        for (int i = 0; i < points.length; i++) {
+            for (int j = 0; j < points[0].length; j++) {
+                intRawIndexer.put(i, j, points[i][j]);
+            }
+        }
+        Mat perspectiveTransformMat = getPerspectiveTransform(boxMat,pointsMat);
+        Mat card = new Mat();
+        warpPerspective(image,card,perspectiveTransformMat,new Size(width,height));
+
+        ImageLoader imageLoader = new ImageLoader();
+        imageLoader.saveImage(card, "src/main/resources/SubImage" + index + ".jpg");
+        return card;
+    }
+    private Point[] findCorners(Mat contour){
+        //toDO
+        return null;
+    }
 }
