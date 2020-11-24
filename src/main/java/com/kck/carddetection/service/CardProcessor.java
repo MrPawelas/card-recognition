@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 
-import static org.bytedeco.opencv.global.opencv_core.*;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 
@@ -22,9 +21,9 @@ public class CardProcessor {
     Mat result;
 
     //todo rozbic na dwie metody
-    public Mat extractCardsFromPicture(Mat imageMatrix) {
+    public Mat extractCardsFromPicture(Mat imageMatrix, Mat originalImage) {
         Mat hierarchy = new Mat();
-        result = new Mat(imageMatrix.rows(), imageMatrix.cols(), CV_8UC1);
+        result = originalImage.clone();
 
         MatVector contoursVec = new MatVector(); //to jest vector z c++ a nie że wektor jako jeden wiersz macierzy
         findContours(imageMatrix, contoursVec, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);

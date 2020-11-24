@@ -26,17 +26,18 @@ public class TemporaryMainRunner {
 //        mat = matrixProcessor.bluredImage(mat);
 //        mat = matrixProcessor.imageThresholded(mat);
 //        imageLoader.saveImage(mat, "src/main/resources/testImage.jpg");
-        Mat mat = imageLoader.loadImage("src/main/resources/cardsOnFloor.jpg");
-        mat = matrixProcessor.resizeImage(mat, 600, 400);
+        Mat mat2 = imageLoader.loadImage("src/main/resources/cardsOnFloor.jpg");
 
-        mat = matrixProcessor.grayImage(mat);
+        mat2 = matrixProcessor.resizeImage(mat2, 600, 400);
+
+        Mat mat = matrixProcessor.grayImage(mat2);
         mat = matrixProcessor.bluredImage(mat);
         imageLoader.saveImage(mat, "src/main/resources/rozmyty.jpg");
 
         mat = matrixProcessor.imageThresholded(mat);
         imageLoader.saveImage(mat, "src/main/resources/tresholded.jpg");
 
-        mat = cardProcessor.extractCardsFromPicture(mat);
+        mat = cardProcessor.extractCardsFromPicture(mat, mat2);
         imageLoader.saveImage(mat, "src/main/resources/done.jpg");
 
         //imageLoader.saveImage(cardTemplateGiver.getCardSuitMatrix(CardSuit.clubs), "src/main/resources/clubsfortesting.jpg");
