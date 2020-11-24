@@ -34,7 +34,7 @@ public class CardProcessor {
         for (Mat mat : contoursVec.get()) {
             if (contourArea(mat) > 1000 && probabilityOfRectangle(mat) > 0.9) {
                 System.out.println("rectangle!");
-                cntfiltered.put(mat);
+                cntfiltered.push_back(mat);
             }
         }
 
@@ -60,7 +60,7 @@ public class CardProcessor {
                 }
             }
             System.out.println(contourArea(mat) / contourArea(boxMat));
-            drawContours(result, new MatVector(boxMat), -1, Scalar.BLUE); //todo tu jest bug, moim zdaniem znajduje prostokąty tylko nie umie ich narysować.
+            drawContours(result, cntfiltered, -1, Scalar.BLUE); //todo tu jest bug, moim zdaniem znajduje prostokąty tylko nie umie ich narysować.
             //todo jeżeli nie uda sie go pokonac to bedzie trzeba przejsc na innego wrappera opencv gdzie nie uzywa sie MatVector tylko liste punktow
         }
         return result;
