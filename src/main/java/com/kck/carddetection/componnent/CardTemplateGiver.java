@@ -3,9 +3,11 @@ package com.kck.carddetection.componnent;
 import com.kck.carddetection.model.CardRank;
 import com.kck.carddetection.model.CardSuit;
 import com.kck.carddetection.service.ImageLoader;
+import com.kck.carddetection.service.MatrixProcessor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -14,10 +16,17 @@ import java.util.HashMap;
 @Component
 @Data
 @RequiredArgsConstructor
+
 public class CardTemplateGiver {
     private final ImageLoader imageLoader;
+    private final MatrixProcessor matrixProcessor;
     private HashMap<CardRank, Mat> rankMap = new HashMap<>();
     private HashMap<CardSuit, Mat> suitMap = new HashMap<>();
+
+    @Value("${config.rankWeight}")
+    private int rankWeight;
+    @Value("${config.rankHeight}")
+    private int rankHeight;
 
     @PostConstruct
     public void init() {
@@ -44,7 +53,7 @@ public class CardTemplateGiver {
     }
 
     private Mat loadRank(CardRank cardRank) {
-        return imageLoader.loadImage("src/main/resources/ranks/" + cardRank + ".jpg");
+        return matrixProcessor.resizeImage(imageLoader.loadImage("src/main/resources/ranks/" + cardRank + ".jpg"), rankWeight, rankHeight);
     }
 
     private Mat loadSuit(CardSuit cardSuit) {

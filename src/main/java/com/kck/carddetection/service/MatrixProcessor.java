@@ -19,14 +19,23 @@ public class MatrixProcessor {
         resize(imageMatrix, result, new Size(width, height), 45, 45, INTER_CUBIC);
         return result;
     }
-    public Mat imageThresholded(Mat imageMatrix){
+
+    public Mat imageThresholded(Mat imageMatrix) {
         Mat result = new Mat();
-        threshold(imageMatrix, result, 130, 255, CV_THRESH_OTSU );
+        threshold(imageMatrix, result, 130, 255, CV_THRESH_OTSU);
         return result;
     }
-    public Mat bluredImage(Mat imageMatrix){
+
+    public Mat bluredImage(Mat imageMatrix) {
         Mat result = new Mat();
         medianBlur(imageMatrix, result, 51);
         return result;
     }
+
+    public Mat blackAndWhiteImage(Mat imageMatrix) {
+        Mat res = grayImage(imageMatrix);
+        res = imageThresholded(res);
+        return res;
+    }
+
 }

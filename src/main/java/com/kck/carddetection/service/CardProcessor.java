@@ -2,16 +2,14 @@ package com.kck.carddetection.service;
 
 import lombok.RequiredArgsConstructor;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
-import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.opencv.opencv_core.*;
-import org.opencv.core.Core;
-import org.opencv.core.CvType;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
-import static org.bytedeco.opencv.global.opencv_core.transpose;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 
@@ -19,12 +17,14 @@ import static org.bytedeco.opencv.global.opencv_imgproc.*;
 @RequiredArgsConstructor
 public class CardProcessor {
 
-    private final MatrixProcessor matrixProcessor;
+    private final CardExtractor cardExtractor;
 
     //todo rozbic na dwie metody
-    public Mat extractCardsFromPicture(Mat imageMatrix, Mat originalImage) {
+    public ArrayList<Mat> extractCardsFromPicture(Mat imageMatrix, Mat originalImage) {
         Mat hierarchy = new Mat();
+        ArrayList<Mat> matArrayList = new ArrayList<>();
         Mat result = originalImage.clone();
+        matArrayList.add(result);
 
         MatVector contoursVec = new MatVector(); //to jest vector z c++ a nie że wektor jako jeden wiersz macierzy
         findContours(imageMatrix, contoursVec, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
@@ -40,7 +40,7 @@ public class CardProcessor {
             // approxPolyDP(mat,temp,epsilon,true);
             if (contourArea(mat) > 1000 && probabilityOfRectangle(mat) > 0.9) {
                 cntfiltered.push_back(mat);
-                System.out.println("rect");
+                //System.out.println("rect");
             }
         }
 
@@ -53,21 +53,10 @@ public class CardProcessor {
         while (it.hasNext()) {
             int index = it.nextIndex();
             it.next();
-            drawContours(result, cntfiltered, index, colors.get(index),10,10,hierarchy,0,new Point(0,0));
-            extractSubImage(cntfiltered.get(index), originalImage,index);
+            drawContours(result, cntfiltered, index, colors.get(index), 10, 10, hierarchy, 0, new Point(0, 0));
+            matArrayList.add(cardExtractor.extractSubImage(cntfiltered.get(index), originalImage));
         }
-
-        return result;
-    }
-
-    public Mat extractSuitFromCard(Mat imageMatrix) {
-        //todo wyciac kolor z karty
-        return null;
-    }
-
-    public Mat extractRankFromCard(Mat imageMatrix) {
-        //todo wyciac numer z karty
-        return null;
+        return matArrayList;
     }
 
     private void addExampleColors(List<Scalar> colors) {
@@ -93,63 +82,10 @@ public class CardProcessor {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 uByteIndexer.put(i, j, Math.round(uByteIndexer.get(i, j)));
-                // System.out.println(uByteIndexer.get(i,j));
-
             }
         }
         return contourArea(contour) / contourArea(boxMat);
     }
 
-    private Mat extractSubImage(Mat contour, Mat image,int index){
-        findCorners(contour);
-        Mat boxMat = new Mat();
-        RotatedRect rotatedRect = minAreaRect(contour);
-        //boxPoints(rotatedRect, boxMat);
-        boxMat = findCorners(contour);
-        Mat pointsMat = new Mat();
-        pointsMat.create(4,2,CvType.CV_32F);
-        FloatRawIndexer intRawIndexer = pointsMat.createIndexer();
-        int width = (int) rotatedRect.size().width();
-        int height = (int) rotatedRect.size().height();
 
-        int[][] points = new int[][]   {{0, height-1},
-                {0, 0},
-                {width-1, 0},
-                {width-1, height-1}};
-
-        for (int i = 0; i < points.length; i++) {
-            for (int j = 0; j < points[0].length; j++) {
-                intRawIndexer.put(i, j, points[i][j]);
-            }
-        }
-        Mat perspectiveTransformMat = getPerspectiveTransform(boxMat,pointsMat);
-        Mat card = new Mat();
-        warpPerspective(image,card,perspectiveTransformMat,new Size(width,height));
-
-        ImageLoader imageLoader = new ImageLoader();
-        imageLoader.saveImage(card, "src/main/resources/SubImage" + index + ".jpg");
-        return card;
-    }
-    private Mat findCorners(Mat contour){
-        IntRawIndexer intRawIndexer = contour.createIndexer();
-        ArrayList<Point> pointList = new ArrayList<>();
-        for (int i = 0; i < contour.rows(); i+=1) {
-            pointList.add(new Point(intRawIndexer.get(i,0,0),intRawIndexer.get(i,0,1)));
-        }
-        Point[] points = new Point[]{
-                pointList.stream().max(Comparator.comparingInt(point -> -point.x() + point.y())).get(),
-                pointList.stream().max(Comparator.comparingInt(point -> -point.x() - point.y())).get(),
-                pointList.stream().max(Comparator.comparingInt(point -> +point.x() - point.y())).get(),
-                pointList.stream().max(Comparator.comparingInt(point -> +point.x() + point.y())).get(),
-        };
-        Mat boxmat = new Mat();
-        boxmat.create(4,2,CvType.CV_32F);
-        FloatRawIndexer intRawIndexer1 = boxmat.createIndexer();
-        for (int i = 0; i < 4; i++) {
-            intRawIndexer1.put(i,0, points[i].x());
-            intRawIndexer1.put(i,1, points[i].y());
-
-        }
-        return boxmat;
-    }
 }
