@@ -26,7 +26,7 @@ public class TemporaryMainRunner {
 //        mat = matrixProcessor.bluredImage(mat);
 //        mat = matrixProcessor.imageThresholded(mat);
 //        imageLoader.saveImage(mat, "src/main/resources/testImage.jpg");
-        Mat mat2 = imageLoader.loadImage("src/main/resources/Zbiory/1.jpg");
+        Mat mat2 = imageLoader.loadImage("src/main/resources/Zbiory/2.jpg");
 
         //  mat2 = matrixProcessor.resizeImage(mat2, 600, 400);
 

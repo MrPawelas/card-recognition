@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
 import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.opencv.opencv_core.*;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.Arrays;
 
+import static org.bytedeco.opencv.global.opencv_core.transpose;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 
@@ -102,7 +104,8 @@ public class CardProcessor {
         findCorners(contour);
         Mat boxMat = new Mat();
         RotatedRect rotatedRect = minAreaRect(contour);
-        boxPoints(rotatedRect, boxMat);
+        //boxPoints(rotatedRect, boxMat);
+        boxMat = findCorners(contour);
         Mat pointsMat = new Mat();
         pointsMat.create(4,2,CvType.CV_32F);
         FloatRawIndexer intRawIndexer = pointsMat.createIndexer();
@@ -127,23 +130,26 @@ public class CardProcessor {
         imageLoader.saveImage(card, "src/main/resources/SubImage" + index + ".jpg");
         return card;
     }
-    private Point[] findCorners(Mat contour){
+    private Mat findCorners(Mat contour){
         IntRawIndexer intRawIndexer = contour.createIndexer();
         ArrayList<Point> pointList = new ArrayList<>();
         for (int i = 0; i < contour.rows(); i+=1) {
             pointList.add(new Point(intRawIndexer.get(i,0,0),intRawIndexer.get(i,0,1)));
         }
-       /* System.out.println(pointList.stream().max(Comparator.comparingInt(Point::x)).get().x() + " " + pointList.stream().max(Comparator.comparingInt(Point::x)).get().y());
-        System.out.println(pointList.stream().min(Comparator.comparingInt(Point::x)).get().x() + " " + pointList.stream().min(Comparator.comparingInt(Point::x)).get().y());
-        System.out.println(pointList.stream().max(Comparator.comparingInt(Point::y)).get().x() + " " + pointList.stream().max(Comparator.comparingInt(Point::y)).get().y());
-        System.out.println(pointList.stream().min(Comparator.comparingInt(Point::y)).get().x() + " " + pointList.stream().min(Comparator.comparingInt(Point::y)).get().y());*/
-
-
-        return new Point[]{
-                pointList.stream().max(Comparator.comparingInt(Point::x)).get(),
-                pointList.stream().min(Comparator.comparingInt(Point::x)).get(),
-                pointList.stream().max(Comparator.comparingInt(Point::y)).get(),
-                pointList.stream().min(Comparator.comparingInt(Point::y)).get()
+        Point[] points = new Point[]{
+                pointList.stream().max(Comparator.comparingInt(point -> -point.x() + point.y())).get(),
+                pointList.stream().max(Comparator.comparingInt(point -> -point.x() - point.y())).get(),
+                pointList.stream().max(Comparator.comparingInt(point -> +point.x() - point.y())).get(),
+                pointList.stream().max(Comparator.comparingInt(point -> +point.x() + point.y())).get(),
         };
+        Mat boxmat = new Mat();
+        boxmat.create(4,2,CvType.CV_32F);
+        FloatRawIndexer intRawIndexer1 = boxmat.createIndexer();
+        for (int i = 0; i < 4; i++) {
+            intRawIndexer1.put(i,0, points[i].x());
+            intRawIndexer1.put(i,1, points[i].y());
+
+        }
+        return boxmat;
     }
 }
