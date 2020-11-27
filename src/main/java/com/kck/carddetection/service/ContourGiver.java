@@ -17,17 +17,21 @@ public class ContourGiver {
         temp = matrixProcessor.grayImage(temp);
         imageLoader.saveImage(temp, "src/main/resources/gray" + imageMatrix.hashCode() + ".jpg");
 
-        temp = matrixProcessor.bluredImage(temp, 11);
+        temp = matrixProcessor.bluredImage(temp, 3);
         imageLoader.saveImage(temp, "src/main/resources/xdd" + imageMatrix.hashCode() + ".jpg");
 
         temp = matrixProcessor.imageThresholded(temp);
-        imageLoader.saveImage(temp, "src/main/resources/tres" + imageMatrix.hashCode() + ".jpg");
+        imageLoader.saveImage(temp, "src/main/resources/tresxxxxxx" + imageMatrix.hashCode() + ".jpg");
 
         Mat hierarchy = new Mat();
         MatVector contoursVec = new MatVector();
         Mat result = null;
         double biggestContour = 0;
         findContours(temp, contoursVec, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+        //
+        //
+        //  System.out.println( contoursVec.get().length);
+
         for (Mat mat : contoursVec.get()) {
             double area = contourArea(mat);
             if (area > biggestContour) {

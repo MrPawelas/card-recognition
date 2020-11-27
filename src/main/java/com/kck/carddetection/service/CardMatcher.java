@@ -30,19 +30,19 @@ public class CardMatcher {
                 lowestDiff = diff;
                 lowestRank = rank;
             }
-            // System.out.println("diff for card "+rank +"is "+diff);
+             System.out.println("diff for card " + rank + "is " + diff);
 
         }
         return new Card(lowestRank, null);
     }
 
     private double calcMatch(Mat imageMatrix, Mat template) {
-        System.out.println(imageMatrix);
+        // System.out.println(imageMatrix);
         imageMatrix = contourGiver.getContours(imageMatrix);
-        System.out.println(imageMatrix);
-        System.out.println(template);
+        //  System.out.println(imageMatrix);
+        //   System.out.println(template);
         template = contourGiver.getContours(template);
-        System.out.println(template);
+        //  System.out.println(template);
         //todo trzeba resizowac template do imagematrix zeby mozna bylo porownac kontury
         //matrixProcessor.resizeImage(template,imageMatrix.arrayWidth(),imageMatrix.arrayHeight());
 

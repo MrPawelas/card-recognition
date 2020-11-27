@@ -28,7 +28,7 @@ public class TemporaryMainRunner {
 //        mat = matrixProcessor.bluredImage(mat);
 //        mat = matrixProcessor.imageThresholded(mat);
 //        imageLoader.saveImage(mat, "src/main/resources/testImage.jpg");
-        Mat mat2 = imageLoader.loadImage("src/main/resources/Pojedyncze/4.jpg");
+        Mat mat2 = imageLoader.loadImage("src/main/resources/Zbiory/1.jpg");
 //        Mat mat3 = matrixProcessor.grayImage(mat2);
 //
 //         mat3 = matrixProcessor.imageThresholded(mat3);
