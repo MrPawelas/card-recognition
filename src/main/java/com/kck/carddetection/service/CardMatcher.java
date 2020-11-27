@@ -8,12 +8,12 @@ import lombok.RequiredArgsConstructor;
 import org.bytedeco.opencv.opencv_core.*;
 import org.springframework.stereotype.Service;
 
-import static org.bytedeco.opencv.global.opencv_core.*;
+import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 @Service
 @RequiredArgsConstructor
 public class CardMatcher {
-
+    private final ContourGiver contourGiver;
     private final ArrayUtils arrayUtils;
     private final CardTemplateGiver cardTemplateGiver;
     private final MatrixProcessor matrixProcessor;
@@ -30,19 +30,26 @@ public class CardMatcher {
                 lowestDiff = diff;
                 lowestRank = rank;
             }
-        }
+            // System.out.println("diff for card "+rank +"is "+diff);
 
+        }
         return new Card(lowestRank, null);
     }
 
     private double calcMatch(Mat imageMatrix, Mat template) {
-        Mat img = matrixProcessor.blackAndWhiteImage(imageMatrix);
-        Mat templ = matrixProcessor.blackAndWhiteImage(template);
-        Mat diff = new Mat();
+        System.out.println(imageMatrix);
+        imageMatrix = contourGiver.getContours(imageMatrix);
+        System.out.println(imageMatrix);
+        System.out.println(template);
+        template = contourGiver.getContours(template);
+        System.out.println(template);
+        //todo trzeba resizowac template do imagematrix zeby mozna bylo porownac kontury
+        //matrixProcessor.resizeImage(template,imageMatrix.arrayWidth(),imageMatrix.arrayHeight());
 
-        absdiff(img, templ, diff);
+        double diff = 3;
 
-        return arrayUtils.sumArray(diff);
+        diff = matchShapes(imageMatrix, template, 1, diff);
+        return diff;
     }
 
 }

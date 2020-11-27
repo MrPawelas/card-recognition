@@ -32,6 +32,12 @@ public class MatrixProcessor {
         return result;
     }
 
+    public Mat bluredImage(Mat imageMatrix, int size) {
+        Mat result = new Mat();
+        medianBlur(imageMatrix, result, size);
+        return result;
+    }
+
     public Mat blackAndWhiteImage(Mat imageMatrix) {
         Mat res = grayImage(imageMatrix);
         res = imageThresholded(res);
