@@ -53,7 +53,7 @@ public class CardExtractor {
         IntRawIndexer intRawIndexer = contour.createIndexer();
         ArrayList<Point> pointList = new ArrayList<>();
         for (int i = 0; i < contour.rows(); i += 1) {
-            pointList.add(new Point(intRawIndexer.get(i, 0, 0), intRawIndexer.get(i, 0, 1)));
+            pointList.add(new Point(intRawIndexer.get(i, 0, 0), intRawIndexer.get(i, 0, 1))); //oczywiscie jak mamy punkt to pierwszy indeks to (0,0) a drugi to (0,1) zamiast po prostu pierwszy = 0, drugi = 1 XDD
         }
         Point[] points = new Point[]{
                 pointList.stream().max(Comparator.comparingInt(point -> -point.x() + point.y())).get(),

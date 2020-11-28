@@ -5,6 +5,7 @@ import com.kck.carddetection.model.Card;
 import com.kck.carddetection.model.CardRank;
 import com.kck.carddetection.utils.ArrayUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.bytedeco.opencv.opencv_core.*;
 import org.springframework.stereotype.Service;
 
@@ -33,22 +34,25 @@ public class CardMatcher {
              System.out.println("diff for card " + rank + "is " + diff);
 
         }
+        contourGiver.contourToImage( contourGiver.getContours(imageMatrix));
+
         return new Card(lowestRank, null);
     }
 
     private double calcMatch(Mat imageMatrix, Mat template) {
         // System.out.println(imageMatrix);
-        imageMatrix = contourGiver.getContours(imageMatrix);
+        //imageMatrix = contourGiver.getContours(imageMatrix);
         //  System.out.println(imageMatrix);
         //   System.out.println(template);
-        template = contourGiver.getContours(template);
+        //template = contourGiver.getContours(template);
         //  System.out.println(template);
         //todo trzeba resizowac template do imagematrix zeby mozna bylo porownac kontury
         //matrixProcessor.resizeImage(template,imageMatrix.arrayWidth(),imageMatrix.arrayHeight());
-
+        matrixProcessor.resizeImage(template,imageMatrix.cols(),imageMatrix.rows());
         double diff = 3;
-
-        diff = matchShapes(imageMatrix, template, 1, diff);
+         //Mat grayImage = matrixProcessor.grayImage(imageMatrix);
+        //Mat grayTemplate = matrixProcessor.grayImage(template);
+        //diff = matchShapes(grayImage, grayTemplate, 1, diff);
         return diff;
     }
 
