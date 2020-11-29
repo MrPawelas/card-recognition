@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RankExtractor {
     public static final int RANK_WIDTH = 60;
-    public static final int RANK_HEIGHT = 70;
+    public static final int RANK_HEIGHT = 90;
 
     public Mat extractRankFromCard(Mat imageMatrix) {
         Mat rankMatrix = new Mat();

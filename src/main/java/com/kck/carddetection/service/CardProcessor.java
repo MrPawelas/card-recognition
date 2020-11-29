@@ -12,6 +12,7 @@ import java.util.ListIterator;
 
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
+//toDo chyba mozna wywalic
 
 @Service
 @RequiredArgsConstructor
@@ -73,7 +74,7 @@ public class CardProcessor {
 
     }
 
-    private double probabilityOfRectangle(Mat contour) {
+    public static double probabilityOfRectangle(Mat contour) {
         Mat boxMat = new Mat();
         RotatedRect rotatedRect = minAreaRect(contour);
         boxPoints(rotatedRect, boxMat);

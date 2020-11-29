@@ -16,6 +16,8 @@ import java.util.ListIterator;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 import static org.opencv.core.CvType.*;
 
+//toDo chyba mozna wywalic
+
 @Service
 @RequiredArgsConstructor
 public class ContourGiver {
@@ -37,7 +39,9 @@ public class ContourGiver {
         MatVector contoursVec = new MatVector();
         findContours(temp, contoursVec, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
         return Arrays.stream(contoursVec.get())
-                .max(Comparator.comparing((opencv_imgproc::contourArea))).get();
+                .filter(x -> CardProcessor.probabilityOfRectangle(x) < 0.9)
+                .max(Comparator.comparing((opencv_imgproc::contourArea)))
+                .get();
 
     }
     public Mat contourToImage(Mat pointsMat){

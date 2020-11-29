@@ -16,25 +16,15 @@ public class TemporaryMainRunner {
     private final MatrixProcessor matrixProcessor;
     private final CardProcessor cardProcessor;
     private final CardMatcher cardMatcher;
+    private final TemplateMatcher templateMatcher;
     private final CardTemplateGiver cardTemplateGiver;
     private final RankExtractor rankExtractor;
     //todo to tylko tymczasowa klasa gdzie mozemy sobie testowac w mainie rzeczy
     //todo docelowo zrobi sie jakis serwis ktory w tle bedzie chodzil i czytal zdjecia z jakiegos folderu i wypluwal do innego folderu output
 
     public void run() {
-//        Mat mat = imageLoader.loadImage("src/main/resources/Zbiory/1.jpg");
-//        mat = matrixProcessor.resizeImage(mat, 500, 500);
-//        mat = matrixProcessor.grayImage(mat);
-//        mat = matrixProcessor.bluredImage(mat);
-//        mat = matrixProcessor.imageThresholded(mat);
-//        imageLoader.saveImage(mat, "src/main/resources/testImage.jpg");
-        Mat mat2 = imageLoader.loadImage("src/main/resources/Zbiory/1.jpg");
-//        Mat mat3 = matrixProcessor.grayImage(mat2);
-//
-//         mat3 = matrixProcessor.imageThresholded(mat3);
-//                imageLoader.saveImage(mat3, "src/main/resources/temptreshxd.jpg");
 
-        //  mat2 = matrixProcessor.resizeImage(mat2, 600, 400);
+        Mat mat2 = imageLoader.loadImage("src/main/resources/Zbiory/1.jpg");
 
         Mat mat = matrixProcessor.grayImage(mat2);
         imageLoader.saveImage(mat, "src/main/resources/szary.jpg");
@@ -55,7 +45,7 @@ public class TemporaryMainRunner {
             imageLoader.saveImage(arrayList.get(i), "src/main/resources/done/temp1" + i + ".jpg");
             Mat card = rankExtractor.extractRankFromCard(arrayList.get(i));
             imageLoader.saveImage(card, "src/main/resources/done/tempRank1" + i + ".jpg");
-            System.out.println("karta to :" + cardMatcher.matchCard(card).toString());
+            System.out.println("karta to :" + templateMatcher.matchCard(card).toString());
         }
 
         imageLoader.saveImage(mat, "src/main/resources/done.jpg");
