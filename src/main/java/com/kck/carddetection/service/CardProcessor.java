@@ -1,7 +1,9 @@
 package com.kck.carddetection.service;
 
+import com.kck.carddetection.model.ExtractedCardsFromPictureModel;
 import lombok.RequiredArgsConstructor;
 import org.bytedeco.javacpp.indexer.FloatRawIndexer;
+import org.bytedeco.javacpp.indexer.IntRawIndexer;
 import org.bytedeco.opencv.opencv_core.*;
 import org.springframework.stereotype.Service;
 
@@ -35,34 +37,29 @@ public class CardProcessor {
     }
 
     //todo rozbic na dwie metody
-    public ArrayList<Mat> extractCardsFromPicture(Mat imageMatrix, Mat originalImage) {
+    public ExtractedCardsFromPictureModel extractCardsFromPicture(Mat imageMatrix, Mat originalImage) {
         Mat hierarchy = new Mat();
+        ExtractedCardsFromPictureModel extractedCardsFromPictureModel = new ExtractedCardsFromPictureModel();
         ArrayList<Mat> matArrayList = new ArrayList<>();
         Mat result = originalImage.clone();
-        matArrayList.add(result);
-
+        extractedCardsFromPictureModel.setPictureWithContours(result);
         MatVector contoursVec = new MatVector(); //to jest vector z c++ a nie że wektor jako jeden wiersz macierzy
         findContours(imageMatrix, contoursVec, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
+        ArrayList<Point> pointList = new ArrayList<>();
 
         MatVector cntfiltered = new MatVector();
         MatVector boxVector = new MatVector();
 
         for (Mat mat : contoursVec.get()) {
-            //todo ten zakomentowany kawałek może się przydać - jak kiedys zamiast prostokatow bedzie widzial niepozamykane figury to odkomentowac
-            //  double epsilon = 0.1*arcLength(mat,true);
-            //   Mat temp = new Mat();
-            //   temp=mat.clone();
-            // approxPolyDP(mat,temp,epsilon,true);
             if (contourArea(mat) > 1000 && probabilityOfRectangle(mat) > 0.9) {
                 cntfiltered.push_back(mat);
-                //System.out.println("rect");
             }
         }
 
         ArrayList<Scalar> colors = new ArrayList<>();
         addExampleColors(colors);
 
-        List<Mat> mats = Arrays.asList(cntfiltered.get()); //taki tam odpowiednik enumerate w javie xd
+        List<Mat> mats = Arrays.asList(cntfiltered.get());
         ListIterator<Mat> it = mats.listIterator();
 
         while (it.hasNext()) {
@@ -70,8 +67,14 @@ public class CardProcessor {
             it.next();
             drawContours(result, cntfiltered, index, colors.get(index), 10, 10, hierarchy, 0, new Point(0, 0));
             matArrayList.add(cardExtractor.extractSubImage(cntfiltered.get(index), originalImage));
+            Mat subImage = cntfiltered.get(index);
+            IntRawIndexer intRawIndexer = cntfiltered.get(index).createIndexer();
+            pointList.add(new Point(intRawIndexer.get(0, 0, 0), intRawIndexer.get(0, 0, 1)));
+
         }
-        return matArrayList;
+        extractedCardsFromPictureModel.setCards(matArrayList);
+        extractedCardsFromPictureModel.setCoordinatesOfTextsToPutOnCard(pointList);
+        return extractedCardsFromPictureModel;
     }
 
     private void addExampleColors(List<Scalar> colors) {

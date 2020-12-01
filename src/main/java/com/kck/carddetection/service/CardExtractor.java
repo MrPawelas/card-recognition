@@ -82,9 +82,7 @@ public class CardExtractor {
         for (int i = 0; i < 4; i++) {
             floatRawIndexer.put(i, 0, points[i].x());
             floatRawIndexer.put(i, 1, points[i].y());
-            System.out.println(points[i].x() + "   " + points[i].y());
         }
-        System.out.println("----------\n");
 
         return boxmat;
     }
