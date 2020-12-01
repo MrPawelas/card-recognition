@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import static org.bytedeco.opencv.global.opencv_core.flip;
+import static org.bytedeco.opencv.global.opencv_core.transpose;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 @Service
@@ -23,12 +25,22 @@ public class CardExtractor {
         Mat boxMat = new Mat();
         RotatedRect rotatedRect = minAreaRect(contour);
         boxMat = findCorners(contour);
+        FloatRawIndexer floatRawIndexer = boxMat.createIndexer();
         Mat pointsMat = new Mat();
         pointsMat.create(4, 2, CvType.CV_32F);
-        FloatRawIndexer intRawIndexer = pointsMat.createIndexer();
 
-        int width = (int) rotatedRect.size().width();
-        int height = (int) rotatedRect.size().height();
+        FloatRawIndexer intRawIndexer = pointsMat.createIndexer();
+        float x1 = floatRawIndexer.get(0, 0);
+        float y1 = floatRawIndexer.get(0, 1);
+
+        float x2 = floatRawIndexer.get(1, 0);
+        float y2 = floatRawIndexer.get(1, 1);
+
+        float x3 = floatRawIndexer.get(2, 0);
+        float y3 = floatRawIndexer.get(2, 1);
+
+        int height = (int) Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1- y2,2) );
+        int width = (int) Math.sqrt(Math.pow(x2 - x3, 2) + Math.pow(y2- y3,2) );
 
         int[][] points = new int[][]{{0, height - 1},
                 {0, 0},
@@ -44,6 +56,11 @@ public class CardExtractor {
         Mat perspectiveTransformMat = getPerspectiveTransform(boxMat, pointsMat);
         Mat card = new Mat();
         warpPerspective(image, card, perspectiveTransformMat, new Size(width, height));
+
+        if(height < width){
+            transpose(card, card);
+            flip(card,card,1); //1 means horizonaly
+        }
         card = matrixProcessor.resizeImage(card, 425, 600);
         return card;
 
@@ -70,6 +87,4 @@ public class CardExtractor {
         }
         return boxmat;
     }
-
-
 }
