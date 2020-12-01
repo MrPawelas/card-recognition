@@ -1,7 +1,7 @@
 package com.kck.carddetection.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bytedeco.opencv.opencv_core.Mat;
+import org.bytedeco.opencv.opencv_core.*;
 import org.springframework.stereotype.Service;
 
 import static org.bytedeco.opencv.global.opencv_imgcodecs.*;

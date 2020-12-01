@@ -27,6 +27,10 @@ public class CardTemplateGiver {
     private int rankWeight;
     @Value("${config.rankHeight}")
     private int rankHeight;
+    @Value("${config.suitWeight}")
+    private int suitWidth;
+    @Value("${config.suitHeight}")
+    private int suitHeight;
 
     @PostConstruct
     public void init() {
@@ -57,7 +61,7 @@ public class CardTemplateGiver {
     }
 
     private Mat loadSuit(CardSuit cardSuit) {
-        return imageLoader.loadImage("src/main/resources/suits/" + cardSuit + ".jpg");
+        return matrixProcessor.resizeImage(imageLoader.loadImage("src/main/resources/suits/" + cardSuit + ".jpg"), suitWidth, suitHeight);
     }
 
 }

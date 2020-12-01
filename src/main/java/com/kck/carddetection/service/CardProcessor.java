@@ -20,6 +20,20 @@ public class CardProcessor {
 
     private final CardExtractor cardExtractor;
 
+    public static double probabilityOfRectangle(Mat contour) {
+        Mat boxMat = new Mat();
+        RotatedRect rotatedRect = minAreaRect(contour);
+        boxPoints(rotatedRect, boxMat);
+        FloatRawIndexer uByteIndexer = boxMat.createIndexer();
+        int rows = boxMat.rows(), cols = boxMat.cols();
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                uByteIndexer.put(i, j, Math.round(uByteIndexer.get(i, j)));
+            }
+        }
+        return contourArea(contour) / contourArea(boxMat);
+    }
+
     //todo rozbic na dwie metody
     public ArrayList<Mat> extractCardsFromPicture(Mat imageMatrix, Mat originalImage) {
         Mat hierarchy = new Mat();
@@ -72,20 +86,6 @@ public class CardProcessor {
         colors.add(Scalar.BLUE);
         colors.add(Scalar.BLUE);
 
-    }
-
-    public static double probabilityOfRectangle(Mat contour) {
-        Mat boxMat = new Mat();
-        RotatedRect rotatedRect = minAreaRect(contour);
-        boxPoints(rotatedRect, boxMat);
-        FloatRawIndexer uByteIndexer = boxMat.createIndexer();
-        int rows = boxMat.rows(), cols = boxMat.cols();
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                uByteIndexer.put(i, j, Math.round(uByteIndexer.get(i, j)));
-            }
-        }
-        return contourArea(contour) / contourArea(boxMat);
     }
 
 

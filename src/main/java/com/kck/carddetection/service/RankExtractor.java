@@ -8,10 +8,21 @@ public class RankExtractor {
     public static final int RANK_WIDTH = 60;
     public static final int RANK_HEIGHT = 90;
 
+    public static final int SUIT_WIDTH = 60;
+    public static final int SUIT_HEIGHT = 70;
+
     public Mat extractRankFromCard(Mat imageMatrix) {
         Mat rankMatrix = new Mat();
         imageMatrix.copyTo(rankMatrix);
         Rect rect = new Rect(0, 10, RANK_WIDTH, RANK_HEIGHT);
+        rankMatrix = new Mat(rankMatrix, rect);
+        return rankMatrix;
+    }
+
+    public Mat extractSuitFromCard(Mat imageMatrix) {
+        Mat rankMatrix = new Mat();
+        imageMatrix.copyTo(rankMatrix);
+        Rect rect = new Rect(0, 60, RANK_WIDTH, RANK_HEIGHT);
         rankMatrix = new Mat(rankMatrix, rect);
         return rankMatrix;
     }
