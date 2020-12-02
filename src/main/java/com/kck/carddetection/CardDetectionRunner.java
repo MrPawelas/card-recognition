@@ -42,6 +42,8 @@ public class CardDetectionRunner {
 
             processedImageMatrix = matrixProcessor.bluredImage(processedImageMatrix);
             processedImageMatrix = matrixProcessor.imageThresholded(processedImageMatrix);
+            //    imageLoader.saveImage(processedImageMatrix, "xdcontours.jpg");
+
             ArrayList<Mat> arrayList = new ArrayList<>();
             ExtractedCardsFromPictureModel extractedCardsFromPictureModel = new ExtractedCardsFromPictureModel();
             extractedCardsFromPictureModel = cardProcessor.extractCardsFromPicture(processedImageMatrix, originalImageMatrix);
@@ -62,7 +64,6 @@ public class CardDetectionRunner {
                 imageLoader.saveImage(arrayList.get(i), cardsInImagePath.toAbsolutePath().toString() + "/" + i + ".jpg");
                 Mat cardMat = rankAndSuitExtractor.extractRankFromCard(arrayList.get(i));
                 Mat cardSuit = rankAndSuitExtractor.extractSuitFromCard(arrayList.get(i));
-                imageLoader.saveImage(cardSuit, "test" + cardSuit.hashCode() + ".jpg");
                 Card card = templateMatcher.matchCard(cardMat, cardSuit);
 
                 String result = "karta " + i + " to :" + card.toString() + "\n";
