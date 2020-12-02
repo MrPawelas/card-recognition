@@ -10,8 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-import static org.bytedeco.opencv.global.opencv_core.flip;
-import static org.bytedeco.opencv.global.opencv_core.transpose;
+import static org.bytedeco.opencv.global.opencv_core.*;
 import static org.bytedeco.opencv.global.opencv_imgproc.*;
 
 @Service
@@ -52,7 +51,6 @@ public class CardExtractor {
                 intRawIndexer.put(i, j, points[i][j]);
             }
         }
-
         Mat perspectiveTransformMat = getPerspectiveTransform(boxMat, pointsMat);
         Mat card = new Mat();
         warpPerspective(image, card, perspectiveTransformMat, new Size(width, height));
@@ -85,6 +83,7 @@ public class CardExtractor {
             floatRawIndexer.put(i, 0, points[i].x());
             floatRawIndexer.put(i, 1, points[i].y());
         }
+
         return boxmat;
     }
 }

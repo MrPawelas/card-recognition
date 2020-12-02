@@ -1,5 +1,7 @@
 package com.kck.carddetection;
 
+import com.kck.carddetection.model.Card;
+import com.kck.carddetection.model.ExtractedCardsFromPictureModel;
 import com.kck.carddetection.service.*;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
@@ -12,6 +14,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import static org.bytedeco.opencv.global.opencv_imgproc.*;
+
 @RequiredArgsConstructor
 @Component
 public class CardDetectionRunner {
@@ -21,7 +25,7 @@ public class CardDetectionRunner {
     private final MatrixProcessor matrixProcessor;
     private final CardProcessor cardProcessor;
     private final TemplateMatcher templateMatcher;
-    private final RankExtractor rankExtractor;
+    private final RankAndSuitExtractor rankAndSuitExtractor;
 
     public void run() {
         Path input = Paths.get(INPUT_DIRECTORY);
@@ -39,11 +43,13 @@ public class CardDetectionRunner {
             processedImageMatrix = matrixProcessor.bluredImage(processedImageMatrix);
             processedImageMatrix = matrixProcessor.imageThresholded(processedImageMatrix);
             ArrayList<Mat> arrayList = new ArrayList<>();
-            arrayList = cardProcessor.extractCardsFromPicture(processedImageMatrix, originalImageMatrix);
-
+            ExtractedCardsFromPictureModel extractedCardsFromPictureModel = new ExtractedCardsFromPictureModel();
+            extractedCardsFromPictureModel = cardProcessor.extractCardsFromPicture(processedImageMatrix, originalImageMatrix);
+            arrayList = extractedCardsFromPictureModel.getCards();
             Paths.get(OUTPUT_DIRECTORY + Paths.get(fileName).getFileName()).toFile().mkdir();
+            Mat contours = extractedCardsFromPictureModel.getPictureWithContours();
 
-            imageLoader.saveImage(arrayList.get(0), OUTPUT_DIRECTORY + Paths.get(fileName).getFileName() + "/contours.jpg");
+            imageLoader.saveImage(contours, OUTPUT_DIRECTORY + Paths.get(fileName).getFileName() + "/contours.jpg");
 
             Path cardsInImagePath = Paths.get(OUTPUT_DIRECTORY + Paths.get(fileName).getFileName());
             cardsInImagePath.toFile().mkdir();
@@ -52,18 +58,22 @@ public class CardDetectionRunner {
             cardsInImagePath = Paths.get(cardsInImagePath + "/cards");
             cardsInImagePath.toFile().mkdir();
 
-            for (int i = 1; i < arrayList.size(); i++) {
+            for (int i = 0; i < arrayList.size(); i++) {
                 imageLoader.saveImage(arrayList.get(i), cardsInImagePath.toAbsolutePath().toString() + "/" + i + ".jpg");
-                Mat card = rankExtractor.extractRankFromCard(arrayList.get(i));
-                Mat cardSuit = rankExtractor.extractSuitFromCard(arrayList.get(i));
+                Mat cardMat = rankAndSuitExtractor.extractRankFromCard(arrayList.get(i));
+                Mat cardSuit = rankAndSuitExtractor.extractSuitFromCard(arrayList.get(i));
+                imageLoader.saveImage(cardSuit, "test" + cardSuit.hashCode() + ".jpg");
+                Card card = templateMatcher.matchCard(cardMat, cardSuit);
 
-                String result = "karta " + i + " to :" + templateMatcher.matchCard(card, cardSuit).toString() + "\n";
+                String result = "karta " + i + " to :" + card.toString() + "\n";
                 try {
+                    putText(contours, card.getCardRank() + " " + card.getCardSuit(), extractedCardsFromPictureModel.getCoordinatesOfTextsToPutOnCard().get(i), 1, 5, Scalar.GREEN, 8, 8, false);
                     FileUtils.writeStringToFile(results, result, "UTF-8", true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+            imageLoader.saveImage(contours, OUTPUT_DIRECTORY + Paths.get(fileName).getFileName() + "/contoursDone.jpg");
         }
     }
 }
