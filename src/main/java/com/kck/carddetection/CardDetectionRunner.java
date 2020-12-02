@@ -25,7 +25,7 @@ public class CardDetectionRunner {
     private final MatrixProcessor matrixProcessor;
     private final CardProcessor cardProcessor;
     private final TemplateMatcher templateMatcher;
-    private final RankExtractor rankExtractor;
+    private final RankAndSuitExtractor rankAndSuitExtractor;
 
     public void run() {
         Path input = Paths.get(INPUT_DIRECTORY);
@@ -60,8 +60,8 @@ public class CardDetectionRunner {
 
             for (int i = 0; i < arrayList.size(); i++) {
                 imageLoader.saveImage(arrayList.get(i), cardsInImagePath.toAbsolutePath().toString() + "/" + i + ".jpg");
-                Mat cardMat = rankExtractor.extractRankFromCard(arrayList.get(i));
-                Mat cardSuit = rankExtractor.extractSuitFromCard(arrayList.get(i));
+                Mat cardMat = rankAndSuitExtractor.extractRankFromCard(arrayList.get(i));
+                Mat cardSuit = rankAndSuitExtractor.extractSuitFromCard(arrayList.get(i));
                 imageLoader.saveImage(cardSuit, "test" + cardSuit.hashCode() + ".jpg");
                 Card card = templateMatcher.matchCard(cardMat, cardSuit);
 
